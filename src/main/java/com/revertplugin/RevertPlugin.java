@@ -28,6 +28,9 @@ public final class RevertPlugin extends JavaPlugin {
         getCommand("lastserver").setExecutor(command);
         getCommand("lastserver").setTabCompleter(command);
 
+        // Register BungeeCord plugin messaging channel
+        getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
+
         getLogger().info("RevertPlugin enabled successfully!");
     }
 
@@ -36,6 +39,10 @@ public final class RevertPlugin extends JavaPlugin {
         if (databaseManager != null) {
             databaseManager.close();
         }
+
+        // Unregister BungeeCord channel
+        getServer().getMessenger().unregisterOutgoingPluginChannel(this, "BungeeCord");
+
         getLogger().info("RevertPlugin disabled.");
     }
 

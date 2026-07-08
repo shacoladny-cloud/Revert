@@ -4,9 +4,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class ConfigManager {
 
@@ -20,8 +18,6 @@ public class ConfigManager {
 
     private final String serverName;
     private final boolean isLobby;
-
-    private final Map<String, ServerInfo> servers = new HashMap<>();
 
     private final int redirectDelayTicks;
     private final List<String> allowedServers;
@@ -62,17 +58,6 @@ public class ConfigManager {
         } else {
             this.serverName = "lobby";
             this.isLobby = false;
-        }
-
-        ConfigurationSection serversSection = config.getConfigurationSection("servers");
-        if (serversSection != null) {
-            for (String key : serversSection.getKeys(false)) {
-                String host = serversSection.getString(key + ".host");
-                int port = serversSection.getInt(key + ".port", 25565);
-                if (host != null) {
-                    servers.put(key.toLowerCase(), new ServerInfo(host, port));
-                }
-            }
         }
 
         ConfigurationSection redirectSection = config.getConfigurationSection("redirect");
@@ -124,14 +109,6 @@ public class ConfigManager {
         return isLobby;
     }
 
-    public ServerInfo getServerInfo(String serverName) {
-        return servers.get(serverName.toLowerCase());
-    }
-
-    public Map<String, ServerInfo> getServers() {
-        return Collections.unmodifiableMap(servers);
-    }
-
     public int getRedirectDelayTicks() {
         return redirectDelayTicks;
     }
@@ -142,8 +119,5 @@ public class ConfigManager {
 
     public boolean isDebug() {
         return debug;
-    }
-
-    public record ServerInfo(String host, int port) {
     }
 }

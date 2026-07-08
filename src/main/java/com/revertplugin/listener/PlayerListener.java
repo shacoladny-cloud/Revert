@@ -1,5 +1,7 @@
 package com.revertplugin.listener;
 
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
 import com.revertplugin.RevertPlugin;
 import com.revertplugin.config.ConfigManager;
 import com.revertplugin.database.DatabaseManager;
@@ -105,15 +107,7 @@ public class PlayerListener implements Listener {
                 return;
             }
 
-            ConfigManager.ServerInfo serverInfo = config.getServerInfo(lastServer);
-            if (serverInfo == null) {
-                plugin.getLogger().warning("No connection info for server: " + lastServer
-                        + ". Player " + player.getName() + " cannot be redirected.");
-                saveAndStay(player, uuid);
-                return;
-            }
-
-            scheduleRedirect(player, serverInfo, lastServer);
+            scheduleRedirect(player, lastServer);
 
         }).exceptionally(throwable -> {
             plugin.getLogger().warning("Error checking player data for " + player.getName()
@@ -126,7 +120,7 @@ public class PlayerListener implements Listener {
         database.saveLastServer(uuid, config.getServerName());
     }
 
-    private void scheduleRedirect(Player player, ConfigManager.ServerInfo serverInfo, String serverName) {
+    private void scheduleRedirect(Player player, String serverName) {
         UUID uuid = player.getUniqueId();
 
         if (!pendingRedirects.add(uuid)) {
@@ -148,9 +142,13 @@ public class PlayerListener implements Listener {
             pendingRedirects.remove(uuid);
 
             try {
-                player.transfer(serverInfo.host(), serverInfo.port());
+                ByteArrayDataOutput out = ByteStreams.newDataOutput();
+                out.writeUTF("Connect");
+                out.writeUTF(serverName);
+                player.sendPluginMessage(plugin, "BungeeCord", out.toByteArray());
+
                 plugin.getLogger().info("Redirected " + player.getName()
-                        + " to " + serverName + " (" + serverInfo.host() + ":" + serverInfo.port() + ")");
+                        + " to " + serverName + " via BungeeCord");
             } catch (Exception e) {
                 plugin.getLogger().warning("Failed to redirect " + player.getName()
                         + " to " + serverName + ": " + e.getMessage());
