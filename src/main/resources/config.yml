@@ -1,0 +1,33 @@
+mysql:
+  host: "127.0.0.1"
+  port: 3306
+  database: "minecraft"
+  username: "root"
+  password: ""
+  pool:
+    maximum-pool-size: 10
+    connection-timeout: 5000
+
+server:
+  name: "lobby"
+  is-lobby: false
+
+servers:
+  build:
+    host: "127.0.0.1"
+    port: 25566
+  farm:
+    host: "127.0.0.1"
+    port: 25567
+  arts:
+    host: "127.0.0.1"
+    port: 25568
+
+redirect:
+  delay-ticks: 20
+  allowed-servers:
+    - "build"
+    - "farm"
+    - "arts"
+
+debug: false
